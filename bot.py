@@ -5,7 +5,7 @@ import base64
 from keep_alive import keep_alive
 
 # 🔑 Secrets থেকে লোড হবে
-BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")     # BotFather token
+BOT_TOKEN = os.environ.get("TELEGRAM_DEMO_BOT_TOKEN")     # BotFather token
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")   # Gemini API key
 
 bot = telebot.TeleBot(BOT_TOKEN)
