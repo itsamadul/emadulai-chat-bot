@@ -5,7 +5,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "✅ Gemini Bot is running!"
+    return "✅ Google Gemini Image Bot is running!"
 
 def run():
     app.run(host='0.0.0.0', port=8080)
