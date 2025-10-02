@@ -4,20 +4,26 @@ import requests
 import base64
 from keep_alive import keep_alive
 
+# 🔑 Secrets
 BOT_TOKEN = os.environ.get("TELEGRAM_DEMO_BOT_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
+if not BOT_TOKEN or not GEMINI_API_KEY:
+    raise ValueError("❌ Please set TELEGRAM_DEMO_BOT_TOKEN and GEMINI_API_KEY in Secrets!")
+
 bot = telebot.TeleBot(BOT_TOKEN)
 
+# /start command
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "👋 Hi! I am your Gemini Image Generator Bot.\nUse /image <prompt> to generate images.")
+    bot.reply_to(message, "👋 Hi! I am your Google Gemini Image Bot.\nUse /image <prompt> to generate images.")
 
+# /image command
 @bot.message_handler(commands=['image'])
 def generate_image(message):
     prompt = message.text.replace("/image", "").strip()
     if not prompt:
-        bot.reply_to(message, "👉 Example: /image A cute cat riding a bike on the moon")
+        bot.reply_to(message, "👉 Example: /image A cute cat riding a skateboard in the rain")
         return
 
     bot.reply_to(message, "🎨 Generating image... Please wait...")
@@ -31,11 +37,10 @@ def generate_image(message):
         "image_size": "1024x1024"
     }
 
-    response = requests.post(url, json=data)
-
-    if response.status_code == 200:
-        result = response.json()
-        try:
+    try:
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            result = response.json()
             image_base64 = result["candidates"][0]["content"]["image"]["b64"]
             image_bytes = base64.b64decode(image_base64)
 
@@ -44,10 +49,11 @@ def generate_image(message):
 
             with open("gemini.png", "rb") as img:
                 bot.send_photo(message.chat.id, img, caption=f"✅ Gemini generated: {prompt}")
-        except:
-            bot.reply_to(message, "⚠️ Error parsing Gemini response")
-    else:
-        bot.reply_to(message, f"❌ API Error {response.status_code}: {response.text}")
+        else:
+            bot.reply_to(message, f"❌ API Error {response.status_code}: {response.text}")
+    except Exception as e:
+        bot.reply_to(message, f"❌ Error: {e}")
 
+# Keep Alive + Start Bot
 keep_alive()
 bot.infinity_polling()
